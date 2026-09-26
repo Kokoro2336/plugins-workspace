@@ -5,15 +5,12 @@
 use std::{
     collections::HashMap,
     ffi::OsString,
-    io::Cursor,
     path::{Path, PathBuf},
     str::FromStr,
     sync::Arc,
     time::Duration,
 };
 
-#[cfg(not(target_os = "macos"))]
-use std::ffi::OsStr;
 
 use base64::Engine;
 use futures_util::StreamExt;
@@ -26,6 +23,10 @@ use reqwest::{
 };
 use semver::Version;
 use serde::{Deserialize, Deserializer, Serialize, de::Error as DeError};
+#[cfg(windows)]
+use std::ffi::OsStr;
+#[cfg(desktop)]
+use std::io::Cursor;
 use tauri::{
     AppHandle, Resource, Runtime,
     utils::{

@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 ///
 /// - **Android / iOS:** Unsupported.
 pub fn reveal_item_in_dir<P: AsRef<Path>>(path: P) -> crate::Result<()> {
-    let path = canonicalize(path.as_ref())?;
+    let _path = canonicalize(path.as_ref())?;
 
     #[cfg(any(
         windows,
@@ -21,7 +21,7 @@ pub fn reveal_item_in_dir<P: AsRef<Path>>(path: P) -> crate::Result<()> {
         target_os = "netbsd",
         target_os = "openbsd"
     ))]
-    return imp::reveal_items_in_dir(&[path]);
+    return imp::reveal_items_in_dir(&[_path]);
 
     #[cfg(not(any(
         windows,
