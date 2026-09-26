@@ -13,7 +13,6 @@ use tauri::{
     plugin::{Builder, PluginHandle, TauriPlugin},
 };
 
-
 mod error;
 mod models;
 

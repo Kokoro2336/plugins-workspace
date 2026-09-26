@@ -105,7 +105,7 @@ pub fn destroy<R: Runtime, M: Manager<R>>(manager: &M) {
         && let Some(dbus_name) = manager
             .try_state::<DBusName>()
             .and_then(|name| WellKnownName::try_from(name.0.clone()).ok())
-        {
-            let _ = connection.0.release_name(dbus_name);
-        }
+    {
+        let _ = connection.0.release_name(dbus_name);
+    }
 }

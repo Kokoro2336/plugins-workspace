@@ -11,7 +11,6 @@ use std::{
     time::Duration,
 };
 
-
 use base64::Engine;
 use futures_util::StreamExt;
 use http::{HeaderName, header::ACCEPT};
@@ -1187,15 +1186,16 @@ impl Update {
                         let mut archive = tar::Archive::new(decoder);
                         for mut entry in archive.entries()?.flatten() {
                             if let Ok(path) = entry.path()
-                                && path.extension() == Some(OsStr::new("AppImage")) {
-                                    // if something went wrong during the extraction, we should restore previous app
-                                    if let Err(err) = entry.unpack(&self.extract_path) {
-                                        std::fs::rename(tmp_app_image, &self.extract_path)?;
-                                        return Err(err.into());
-                                    }
-                                    // early finish we have everything we need here
-                                    return Ok(());
+                                && path.extension() == Some(OsStr::new("AppImage"))
+                            {
+                                // if something went wrong during the extraction, we should restore previous app
+                                if let Err(err) = entry.unpack(&self.extract_path) {
+                                    std::fs::rename(tmp_app_image, &self.extract_path)?;
+                                    return Err(err.into());
                                 }
+                                // early finish we have everything we need here
+                                return Ok(());
+                            }
                         }
                         // if we have not returned early we should restore the backup
                         std::fs::rename(tmp_app_image, &self.extract_path)?;
@@ -1289,17 +1289,19 @@ impl Update {
             .arg(install_arg)
             .arg(pkg_path)
             .status()
-            && status.success() {
-                log::debug!("installed {pkg_path:?} with pkexec");
-                return Ok(());
-            }
+            && status.success()
+        {
+            log::debug!("installed {pkg_path:?} with pkexec");
+            return Ok(());
+        }
 
         // 2. Try zenity or kdialog for a graphical sudo experience
         if let Ok(password) = self.get_password_graphically()
-            && self.install_with_sudo(pkg_path, &password, install_cmd, install_arg)? {
-                log::debug!("installed {pkg_path:?} with GUI sudo");
-                return Ok(());
-            }
+            && self.install_with_sudo(pkg_path, &password, install_cmd, install_arg)?
+        {
+            log::debug!("installed {pkg_path:?} with GUI sudo");
+            return Ok(());
+        }
 
         // 3. Final fallback: terminal sudo
         let status = std::process::Command::new("sudo")
@@ -1327,9 +1329,10 @@ impl Update {
             .output();
 
         if let Ok(output) = zenity_result
-            && output.status.success() {
-                return Ok(String::from_utf8_lossy(&output.stdout).trim().to_string());
-            }
+            && output.status.success()
+        {
+            return Ok(String::from_utf8_lossy(&output.stdout).trim().to_string());
+        }
 
         // Fall back to kdialog if zenity fails or isn't available
         let kdialog_result = std::process::Command::new("kdialog")
@@ -1337,9 +1340,10 @@ impl Update {
             .output();
 
         if let Ok(output) = kdialog_result
-            && output.status.success() {
-                return Ok(String::from_utf8_lossy(&output.stdout).trim().to_string());
-            }
+            && output.status.success()
+        {
+            return Ok(String::from_utf8_lossy(&output.stdout).trim().to_string());
+        }
 
         Err(Error::AuthenticationFailed)
     }

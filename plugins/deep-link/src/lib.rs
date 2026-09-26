@@ -65,10 +65,10 @@ fn init_deep_link<R: Runtime>(
             },
         )?;
 
-        return Ok(DeepLink {
+        Ok(DeepLink {
             app: app.clone(),
             plugin_handle: handle,
-        });
+        })
     }
 
     #[cfg(target_os = "ios")]
@@ -417,9 +417,10 @@ mod imp {
                 if mimeapps_path.exists() {
                     let mut mimeapps = ini::Ini::load_from_file(&mimeapps_path)?;
                     if let Some(section) = mimeapps.section_mut(Some("Default Applications"))
-                        && section.get(&mime_type).unwrap_or_default() == file_name {
-                            section.remove(&mime_type);
-                        }
+                        && section.get(&mime_type).unwrap_or_default() == file_name
+                    {
+                        section.remove(&mime_type);
+                    }
                     mimeapps.write_to_file(&mimeapps_path)?;
                 }
 
@@ -559,8 +560,6 @@ impl<R: Runtime> DeepLink<R> {
     ///
     /// Use `get_current` on app load to check whether your app was started via a deep link.
     pub fn on_open_url<F: Fn(OpenUrlEvent) + Send + Sync + 'static>(&self, f: F) -> EventId {
-        
-
         self.app.listen("deep-link://new-url", move |event| {
             if let Ok(urls) = serde_json::from_str(event.payload()) {
                 f(OpenUrlEvent {

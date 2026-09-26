@@ -71,11 +71,12 @@ where
 {
     let opt = Option::<String>::deserialize(deserializer)?;
     if let Some(ref host) = opt
-        && let Some((scheme, _)) = host.split_once("://") {
-            return Err(serde::de::Error::custom(format!(
-                "host `{host}` cannot start with a scheme, please remove the `{scheme}://` prefix"
-            )));
-        }
+        && let Some((scheme, _)) = host.split_once("://")
+    {
+        return Err(serde::de::Error::custom(format!(
+            "host `{host}` cannot start with a scheme, please remove the `{scheme}://` prefix"
+        )));
+    }
     Ok(opt)
 }
 
