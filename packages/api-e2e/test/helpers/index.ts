@@ -148,9 +148,19 @@ export async function tauri<R, A extends unknown[]>(
       .then(
         function (value) { return { ok: true, value: value === undefined ? null : value }; },
         function (error) {
+          // Mobile plugins reject with a \`{ message, code?, data? }\` object
+          // rather than a string or an Error.
+          var message =
+            error instanceof Error
+              ? error.message
+              : error && typeof error === 'object' && typeof error.message === 'string'
+                ? error.message
+                : typeof error === 'object'
+                  ? JSON.stringify(error)
+                  : String(error);
           return {
             ok: false,
-            error: error instanceof Error ? error.message : String(error),
+            error: message,
             stack: error instanceof Error ? error.stack : undefined
           };
         }
